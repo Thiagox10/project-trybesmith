@@ -9,6 +9,6 @@ const create = async (user: User) => {
   return result;
 };
 
-export {
+export default {
   create,
 };
