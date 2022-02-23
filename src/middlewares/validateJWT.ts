@@ -16,7 +16,7 @@
 
 //   try {
 //     /* Através o método verify, podemos validar e decodificar o nosso JWT. */
-//     const decoded = jwt.verify(token, segredo);
+//     const decoded = jwt.verify(token, secret);
 //     console.log(decoded);
 //     /*
 //       A variável decoded será um objeto equivalente ao seguinte:
@@ -39,9 +39,7 @@
 
 //     /* Não existe um usuário na nossa base com o id informado no token. */
 //     if (!user) {
-//       return res
-//         .status(401)
-//         .json({ message: 'Erro ao procurar usuário do token.' });
+//       return res.status(401).json({ message: 'Erro ao procurar usuário do token.' });
 //     }
 
 //     /* O usuário existe! Colocamos ele em um campo no objeto req.
@@ -56,3 +54,5 @@
 //     return res.status(401).json({ message: err.message });
 //   }
 // };
+
+// export default validateJwt;

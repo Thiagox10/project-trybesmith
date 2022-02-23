@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import jwt from 'jsonwebtoken';
 import StatusCode from '../enums/StatusCode';
-import { IUser } from '../interfaces/User';
+import { IUser, Login } from '../interfaces/User';
 import userModel from '../models/userModel';
 
 const schemaUser = Joi.object({
@@ -56,6 +56,25 @@ const create = async (user: IUser): Promise<Result> => {
   return { token };
 };
 
+const login = async (user: Login): Promise<Result> => {
+  const { username, password } = user;
+
+  if (!username) return { status: StatusCode.BAD_REQUEST, message: 'Username is required' };
+
+  if (!password) return { status: StatusCode.BAD_REQUEST, message: 'Password is required' };
+
+  const result = await userModel.login(user);
+  
+  if (result.length === 0) {
+    return { status: StatusCode.UNAUTHORIZED, message: 'Username or password invalid' };
+  }
+  const [resultUser] = result;
+  const { id } = resultUser;
+  const token = jwt.sign({ data: { id, username } }, secret, jwtConfig);
+  return { token };
+};
+
 export default {
   create,
+  login,
 };
