@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import User from '../interfaces/User';
+import StatusCode from '../enums/StatusCode';
+import { IUser } from '../interfaces/User';
 import userService from '../services/userService';
 
 const create = async (req: Request, res: Response) => {
-  const payload: User = req.body;
+  const payload: IUser = req.body;
 
-  const result = await userService.create(payload);
-  // const error = result.message;
-  if (result.message) return res.status(result.status).json({ error: result.message });
+  const { status, message, token } = await userService.create(payload);
+  if (status) return res.status(status).json({ error: message });
 
-  res.status(422).json('token');
+  return res.status(StatusCode.CREATED).json({ token });
 };
 
 export default {

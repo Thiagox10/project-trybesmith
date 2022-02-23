@@ -16,7 +16,7 @@ const schemaUser = Joi.object({
   }),
   password: Joi.string().min(8).required().messages({
     'any.required': 'Password is required',
-    'string.min': 'Password must be longer than 2 characters',
+    'string.min': 'Password must be longer than 7 characters',
     'string.base': 'Password must be a string',
   }),
 });
