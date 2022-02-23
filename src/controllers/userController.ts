@@ -12,6 +12,10 @@ const create = async (req: Request, res: Response) => {
   return res.status(StatusCode.CREATED).json({ token });
 };
 
+// const login = async (req: Request, res: Response) => {
+//   const
+// };
+
 export default {
   create,
 };
