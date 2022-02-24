@@ -56,12 +56,30 @@ const create = async (user: IUser): Promise<Result> => {
   return { token };
 };
 
+const schemaLogin = Joi.object({
+  username: Joi.string().min(3).required().messages({
+    'any.required': 'Username is required',
+    'string.base': 'Username must be a string',
+    'string.min': 'Username must be longer than 2 characters',
+  }),
+  password: Joi.string().min(8).required().messages({
+    'any.required': 'Password is required',
+    'string.base': 'Password must be a string',
+    'string.min': 'Password must be longer than 7 characters',
+  }),
+});
+
 const login = async (user: Login): Promise<Result> => {
-  const { username, password } = user;
+  const { username } = user;
 
-  if (!username) return { status: StatusCode.BAD_REQUEST, message: 'Username is required' };
+  const { error } = schemaLogin.validate(user);
 
-  if (!password) return { status: StatusCode.BAD_REQUEST, message: 'Password is required' };
+  if (error) {
+    if (error.message.includes('required')) {
+      return { status: StatusCode.BAD_REQUEST, message: error.message };
+    }
+    return { status: StatusCode.UNPROCESSABLE_ENTITY, message: error.message };
+  }
 
   const result = await userModel.login(user);
   

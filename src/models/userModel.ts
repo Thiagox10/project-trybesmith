@@ -22,7 +22,23 @@ const login = async (user: Login) => {
   return result as User[];
 };
 
+const getById = async (id: number) => {
+  const [result] = await connection.execute(`
+  SELECT id, username FROM Trybesmith.Users 
+  WHERE id = ?`, [id]);
+  return result as User[];
+};
+
+const getUser = async (id: number, username: string) => {
+  const [result] = await connection.execute(`
+  SELECT id, username FROM Trybesmith.Users 
+  WHERE id = ? AND username = ?`, [id, username]);
+  return result as User[];
+};
+
 export default {
   create,
   login,
+  getById,
+  getUser,
 };

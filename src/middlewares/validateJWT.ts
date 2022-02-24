@@ -1,58 +1,47 @@
-// import { NextFunction } from 'express';
-// import jwt from 'jsonwebtoken';
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import StatusCode from '../enums/StatusCode';
+import { TokenInterface } from '../interfaces/TokenInterface';
+import userModel from '../models/userModel';
 
-// // const { User } = require('../../models');
+// const { User } = require('../../models');
 
-// const secret = 'xablau';
+const secret = 'xablau';
 
-// const validateJwt = async (req: Request, res: Response, next: NextFunction) => {
-//   const token = req.headers.authorization;
+const validateJwt = async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.headers.authorization;
+  
+  /* Caso o token não seja informado, simplesmente retornamos
+     o código de status 401 - não autorizado. */
+  if (!token) {
+    return res.status(StatusCode.UNAUTHORIZED).json({ error: 'Token not found' });
+  }
 
-//   /* Caso o token não seja informado, simplesmente retornamos
-//      o código de status 401 - não autorizado. */
-//   if (!token) {
-//     return res.status(401).json({ error: 'Token não encontrado' });
-//   }
+  try {
+    const decoded = jwt.verify(token, secret) as TokenInterface;
+    // console.log(decoded);
+    const { id, username } = decoded.data;
 
-//   try {
-//     /* Através o método verify, podemos validar e decodificar o nosso JWT. */
-//     const decoded = jwt.verify(token, secret);
-//     console.log(decoded);
-//     /*
-//       A variável decoded será um objeto equivalente ao seguinte:
-//       {
-//         data: {
-//           id: '3',
-//           username: 'italssodj',
-//           password: 'senha123'
-//         },
-//         iat: 1582587327,
-//         exp: 1584774714908
-//       }
-//     */
+    /* Caso o token esteja expirado, a própria biblioteca irá retornar um erro,
+       por isso não é necessário fazer validação do tempo.
+       Caso esteja tudo certo, nós então buscamos o usuário na base para obter seus dados atualizados */
 
-//     /* Caso o token esteja expirado, a própria biblioteca irá retornar um erro,
-//        por isso não é necessário fazer validação do tempo.
-//        Caso esteja tudo certo, nós então buscamos o usuário na base para obter seus dados atualizados */
+    const [user] = await userModel.getUser(id, username);
+    
+    /* Não existe um usuário na nossa base com o id informado no token. */
+    if (!user) {
+      return res.status(401).json({ message: 'Erro ao procurar usuário do token.' });
+    }
 
-//     const user = await User.findOne({ where: { username: decoded.data.username } });
+    /* O usuário existe! Colocamos ele em um campo no objeto req.
+       Dessa forma, o usuário estará disponível para outros middlewares que
+       executem em sequência */
+    // req.user = user;
 
-//     /* Não existe um usuário na nossa base com o id informado no token. */
-//     if (!user) {
-//       return res.status(401).json({ message: 'Erro ao procurar usuário do token.' });
-//     }
+    next();
+  } catch (err) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
+};
 
-//     /* O usuário existe! Colocamos ele em um campo no objeto req.
-//        Dessa forma, o usuário estará disponível para outros middlewares que
-//        executem em sequência */
-//     req.user = user;
-
-//     /* Por fim, chamamos o próximo middleware que, no nosso caso,
-//        é a própria callback da rota. */
-//     next();
-//   } catch (err) {
-//     return res.status(401).json({ message: err.message });
-//   }
-// };
-
-// export default validateJwt;
+export default validateJwt;
