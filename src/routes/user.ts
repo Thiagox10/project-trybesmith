@@ -11,4 +11,6 @@ router.post('/login', userController.login);
 
 router.post('/products', validateJwt, productsController.create);
 
+router.get('/products', validateJwt, productsController.getAll);
+
 export default router;

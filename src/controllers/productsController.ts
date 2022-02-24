@@ -22,6 +22,12 @@ const create = async (req: Request, res: Response) => {
   return res.status(StatusCode.CREATED).json(result);
 };
 
+const getAll = async (req: Request, res: Response) => {
+  const result = await productsService.getAll();
+  return res.status(200).json(result);
+};
+
 export default {
   create,
+  getAll,
 };

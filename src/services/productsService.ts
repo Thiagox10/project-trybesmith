@@ -26,6 +26,12 @@ const create = async (product: IProduct): Promise<ResultError> => {
   return { result };
 };
 
+const getAll = async () => {
+  const result = await productsModel.getAll();
+  return result;
+};
+
 export default {
   create,
+  getAll,
 };
